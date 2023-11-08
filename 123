@@ -1,5 +1,6 @@
 public class Main {
     public static void main(String[] args) {
+        System.out.println("Задание ?Калькулятор?");
         Calculator calc = Calculator.instance.get();
 
         int a = calc.plus.apply(1, 2);
@@ -7,7 +8,15 @@ public class Main {
         int c = calc.devide.apply(a, b);
 
         calc.println.accept(c);
+        /////////////////////////////////////////////////
+        System.out.println("Задание ?Воркер?");
+        Worker.OnTaskDoneListener listener = System.out::println;
+        Worker.OnTaskErrorListener errorListener = System.out::println;
+        Worker worker = new Worker(listener, errorListener);
+        worker.start();
     }
+
+
 }
 
 import java.util.function.*; // для работы калькулятора нужно
@@ -39,3 +48,33 @@ public class Calculator {
     Consumer<Integer> println = System.out::println;
 
 }
+
+public class Worker {
+    @FunctionalInterface
+    public interface OnTaskDoneListener {
+        void onDone(String result);
+    }
+    @FunctionalInterface
+    public interface OnTaskErrorListener {
+        void onError(String error);
+    }
+
+    private OnTaskDoneListener callback;
+    private OnTaskErrorListener errorCallback;
+
+    public Worker(OnTaskDoneListener callback, OnTaskErrorListener errorCallback) {
+        this.callback = callback;
+        this.errorCallback = errorCallback;
+    }
+
+    public void start() {
+        for (int i = 0; i < 100; i++) {
+            if (i == 33) {
+                errorCallback.onError("Ошибка " +  i);
+            } else {
+                callback.onDone("Task " + i + " is done");
+            }
+        }
+    }
+}
+
